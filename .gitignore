@@ -1,0 +1,21 @@
+/target
+Cargo.lock
+# Any other stuff...
+.direnv
+
+# LaTeX
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.bbl
+*.blg
+*.run.xml
+*-blx.bib
+*.bcf
+*.pdf

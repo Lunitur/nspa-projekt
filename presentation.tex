@@ -1,0 +1,222 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[croatian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{Prüferovi kodovi i problem "Clues"}
+\author{Analiza teorije i implementacija rješenja}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Uvod: Prüferovi kodovi}
+\begin{itemize}
+    \item \textbf{Prüferov niz (kod)} je jedinstveni niz koji predstavlja označeno stablo.
+    \item Za stablo s $n$ čvorova označenih od $1$ do $n$, Prüferov kod ima duljinu $n-2$.
+    \item Predstavlja \textbf{bijekciju} između skupa svih označenih stabala s $n$ čvorova i skupa svih nizova duljine $n-2$ nad abecedom {1, 2, ..., n}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Konstrukcija Prüferovog koda}
+Algoritam za dobivanje Prüferovog koda iz stabla:
+\begin{enumerate}
+    \item Pronađi list (čvor stupnja 1) s najmanjom oznakom.
+    \item Zabilježi oznaku njegovog jedinog susjeda u niz.
+    \item Ukloni taj list i pripadajući brid iz stabla.
+    \item Ponavljaj postupak dok u stablu ne ostanu točno 2 čvora.
+\end{enumerate}
+\vspace{0.5cm}
+Ovo generira niz duljine $n-2$. Svaki čvor $v$ se u nizu pojavljuje točno $d(v) - 1$ puta, gdje je $d(v)$ stupanj čvora $v$ u stablu.
+\end{frame}
+
+\begin{frame}
+\frametitle{Rekonstrukcija stabla iz Prüferovog koda}
+Algoritam za dobivanje stabla iz Prüferovog koda $P$ duljine $n-2$:
+\begin{enumerate}
+    \item Generiraj skup $S$ koji sadrži sve moguće oznake čvorova $\{1, 2, \dots, n\}$.
+    \item Ponavljaj sljedeće dok niz $P$ nije prazan:
+    \begin{itemize}
+        \item Neka je $v$ prvi element u nizu $P$.
+        \item Pronađi najmanji element $u$ iz skupa $S$ koji se \textbf{ne nalazi} u nizu $P$.
+        \item Dodaj brid $(u, v)$ u stablo.
+        \item Ukloni $v$ s početka niza $P$ i ukloni $u$ iz skupa $S$.
+    \end{itemize}
+    \item Na kraju, u skupu $S$ ostat će točno 2 elementa (npr. $u$ i $v$). Dodaj zadnji brid $(u, v)$ u stablo.
+\end{enumerate}
+\vspace{0.3cm}
+Ovaj algoritam jasno pokazuje da za svaki ispravan Prüferov niz duljine $n-2$ postoji jedinstveno stablo, čime je dokazana bijekcija.
+\end{frame}
+
+\begin{frame}
+\frametitle{Cayleyjeva formula}
+Kao izravna posljedica bijekcije Prüferovih kodova proizlazi \textbf{Cayleyjeva formula}.
+\vspace{0.5cm}
+\begin{block}{Teorem (Cayleyjeva formula)}
+Broj različitih označenih stabala na $n$ čvorova je jednak $n^{n-2}$.
+\end{block}
+\vspace{0.5cm}
+Zašto? Postoji $n^{n-2}$ različitih nizova duljine $n-2$ čiji su elementi iz skupa od $n$ mogućih vrijednosti. Zbog bijekcije, toliko ima i označenih stabala.
+\end{frame}
+
+\begin{frame}
+\frametitle{Problem "Clues" (Codeforces 156D)}
+\textbf{Opis problema:}
+\begin{itemize}
+    \item Zadan je graf s $n$ čvorova (tragovi) i $m$ bridova (veze).
+    \item Graf se sastoji od $k$ povezanih komponenti.
+    \item Potrebno je dodati \textbf{minimalan broj bridova} kako bi graf postao povezan (kako bi postojao put između svaka dva traga).
+    \item Cilj: Izračunati \textbf{broj različitih načina} za dodavanje tih bridova, modulo dani broj. Dva načina su različita ako postoji brid koji je u jednom dodan, a u drugom nije.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Analiza problema}
+\begin{itemize}
+    \item Minimalni broj bridova za povezivanje $k$ komponenti je točno $k - 1$.
+    \item Dodavanjem $k-1$ bridova formiramo razapinjuće stablo (spanning tree) čiji su čvorovi zapravo originalne povezane komponente.
+    \item Neka su veličine (broj čvorova) tih $k$ povezanih komponenti $s_1, s_2, \dots, s_k$.
+    \item Spajanjem komponente $i$ s komponentom $j$, biramo jedan čvor iz prve komponente i jedan iz druge. To možemo napraviti na $s_i \times s_j$ načina.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Uopćena Cayleyjeva formula}
+Broj načina za povezivanje $k$ komponenti u jedno stablo definiran je formulom:
+\[ N = n^{k-2} \prod_{i=1}^k s_i \]
+\vspace{0.2cm}
+Ovo je poznato kao uopćena Cayleyjeva formula. Kako do nje dolazimo?
+\end{frame}
+
+\begin{frame}
+\frametitle{Dokaz pomoću Prüferovih kodova}
+\begin{itemize}
+    \item Razmotrimo stablo gdje su čvorovi komponente. Neka komponenta $i$ ima stupanj $d_i$ u tom novom stablu.
+    \item Broj načina da odaberemo konkretne vrhove iz komponenti za to specifično stablo je $\prod_{i=1}^k s_i^{d_i}$.
+    \item Zbroj po svim mogućim stablima na $k$ čvorova:
+    \[ \sum_{T} \prod_{i=1}^k s_i^{d_i} = \prod_{i=1}^k s_i \sum_{T} \prod_{i=1}^k s_i^{d_i - 1} \]
+    \item U Prüferovom nizu duljine $k-2$, čvor $i$ se pojavljuje $d_i - 1$ puta. Sumiranje preko svih mogućih Prüferovih nizova je ekvivalentno:
+    \[ \sum_{x_1, \dots, x_{k-2}} s_{x_1} s_{x_2} \dots s_{x_{k-2}} \]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Završetak dokaza}
+\begin{itemize}
+    \item Gornja suma je po \textbf{multinomnom teoremu} jednaka:
+    \[ (s_1 + s_2 + \dots + s_k)^{k-2} \]
+    \item Budući da je suma veličina svih komponenti jednaka ukupnom broju čvorova $n$ ($s_1 + s_2 + \dots + s_k = n$), dobivamo:
+    \[ n^{k-2} \]
+    \item Konačan rezultat je dakle:
+    \[ n^{k-2} \prod_{i=1}^k s_i \]
+    \item Poseban slučaj: Ako je $k=1$, broj načina je $1 \pmod{\text{modulo}}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Rješenje: Implementacija u Rustu (1/2)}
+\begin{lstlisting}[basicstyle=\ttfamily\tiny]
+// Nalazenje povezanih komponenti pomocu BFS-a
+let mut visited = vec![false; n];
+let mut components = Vec::new();
+
+for i in 0..n {
+    if !visited[i] {
+        let mut count = 0u64;
+        let mut q = VecDeque::new();
+        q.push_back(i);
+        visited[i] = true;
+        while let Some(u) = q.pop_front() {
+            count += 1;
+            for &v in &adj[u] {
+                if !visited[v] {
+                    visited[v] = true;
+                    q.push_back(v);
+                }
+            }
+        }
+        components.push(count);
+    }
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Rješenje: Implementacija u Rustu (2/2)}
+\begin{lstlisting}
+let k = components.len() as u64;
+
+// Poseban slucaj
+if k == 1 {
+    println!("{}", 1 % modulo);
+    return;
+}
+
+// Izracun formule: n^(k-2) * product(s_i)
+let mut ans = pow(Mod::new(n as u64, modulo), k - 2);
+for &c in &components {
+    ans = ans * Mod::new(c, modulo);
+}
+
+println!("{}", ans.value());
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{Složenost}
+\begin{itemize}
+    \item \textbf{Vremenska složenost:} 
+    \begin{itemize}
+        \item Učitavanje grafa i pronalazak komponenti (BFS): $\mathcal{O}(n + m)$.
+        \item Modularno potenciranje $n^{k-2}$: $\mathcal{O}(\log k)$.
+        \item Množenje veličina komponenti: $\mathcal{O}(k)$.
+        \item Ukupna vremenska složenost: $\mathcal{O}(n + m + \log k)$.
+    \end{itemize}
+    \item \textbf{Prostorna složenost:} 
+    \begin{itemize}
+        \item Predstavljanje grafa (liste susjedstva): $\mathcal{O}(n + m)$.
+        \item Pomoćni nizovi (\texttt{visited}, \texttt{components}, BFS red): $\mathcal{O}(n)$.
+        \item Ukupna prostorna složenost: $\mathcal{O}(n + m)$.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+    \Huge Pitanja?
+\end{center}
+\end{frame}
+
+\end{document}
